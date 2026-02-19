@@ -46,6 +46,7 @@ button:hover {
 <body>
 
 <div class="box">
+    <img src="logo.png" class="logo">
 <h2>ادخل رقمك التعريفي</h2>
 <input type="text" id="searchId" placeholder="الرقم التعريفي">
 <button onclick="search()">بحث</button>

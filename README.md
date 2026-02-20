@@ -21,7 +21,7 @@ body {
 }
 
 .logo {
-    width: 250px;
+    width: 400px;
     margin-bottom: 10px;
 }
 

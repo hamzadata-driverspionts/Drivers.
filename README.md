@@ -119,7 +119,7 @@ async function search() {
 
         for(let rec of records){
             if(rec.type.toLowerCase() === "خصم") totalPoints -= rec.points;
-            else if(rec.type.toLowerCase() === "إضافة") totalPoints += rec.points;
+            else if(rec.type.toLowerCase() === "اضافة") totalPoints += rec.points;
 
             recordHTML += `<li>${rec.date} | ${rec.type} | ${rec.reason} | ${rec.points}</li>`;
         }

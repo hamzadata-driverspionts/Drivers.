@@ -116,7 +116,7 @@ async function search() {
                 // توحيد كلمة اضافة
                 type = type.replace("إ","ا");
 
-                if(type === "red خصم"){
+                if(type === "خصم"){
                     totalPoints -= points;
                     html += `<div class="deduct">${date} | خصم | ${reason} | ${points}</div>`;
                 }

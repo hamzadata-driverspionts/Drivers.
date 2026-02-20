@@ -150,9 +150,12 @@ async function search() {
            // ترجمة الاسم
 let translatedName = await translateText(name, "en");
 
+// ترجمة الاسم إلى العربي
+let arabicName = await translateToArabic(name);
+
 let html = `
-<b>الاسم:</b> ${name}<br>
-<b>Name:</b> ${translatedName}<br><br>
+<b>الاسم:</b> ${arabicName}<br>
+<b>Name:</b> ${name}<br><br>
 `;
             ${html}
             <div class="points-final">النقاط الحالية: ${totalPoints} / 12</div>

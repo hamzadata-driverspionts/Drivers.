@@ -41,45 +41,17 @@ button {
     font-size: 16px;
 }
 
-button:hover {
-    background: #1b5e20;
-}
-
 .result {
     margin-top: 20px;
     font-size: 15px;
-    line-height: 1.7;
     text-align: right;
 }
 
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    padding: 6px;
-    border-bottom: 1px solid #eee;
-}
-
-.deduct {
-    color: red;
-    font-weight: bold;
-}
-
-.add {
-    color: green;
-    font-weight: bold;
-}
+.add { color: green; }
+.deduct { color: red; }
 
 .points-final {
-    margin-top: 15px;
     font-size: 18px;
-    font-weight: bold;
-}
-
-.warning {
-    color: red;
     font-weight: bold;
     margin-top: 10px;
 }
@@ -104,7 +76,7 @@ async function search() {
     let id = document.getElementById("searchId").value.trim();
     let resultBox = document.getElementById("result");
 
-    if(!id){
+    if(id === ""){
         resultBox.innerHTML = "الرجاء إدخال الرقم التعريفي";
         return;
     }
@@ -113,73 +85,67 @@ async function search() {
 
     try {
 
-        let res = await fetch(sheetURL);
-        let text = await res.text();
+        let response = await fetch(sheetURL);
+        let data = await response.text();
 
-        let rows = text.split("\n").slice(1);
-        let records = [];
+        let rows = data.split("\n").slice(1);
 
-        for(let row of rows){
-            if(!row.trim()) continue;
+        let totalPoints = 12;
+        let html = "";
+        let found = false;
+        let name = "";
+
+        rows.forEach(row => {
+
+            if(row.trim() === "") return;
 
             let cols = row.split(",");
 
-            if(cols[0].trim() === id){
-                records.push({
-                    name: cols[1].trim(),
-                    date: cols[2].trim(),
-                    type: cols[3].trim(),
-                    reason: cols[4].trim(),
-                    points: parseFloat(cols[5])
-                });
-            }
-        }
+            let rowId = (cols[0] || "").trim();
 
-        if(records.length === 0){
+            if(rowId === id){
+
+                found = true;
+
+                name = cols[1] ? cols[1].trim() : "";
+                let date = cols[2] ? cols[2].trim() : "";
+                let type = cols[3] ? cols[3].trim() : "";
+                let reason = cols[4] ? cols[4].trim() : "";
+                let points = parseFloat(cols[5]) || 0;
+
+                // توحيد كلمة اضافة
+                type = type.replace("إ","ا");
+
+                if(type === "خصم"){
+                    totalPoints -= points;
+                    html += `<div class="deduct">${date} | خصم | ${reason} | ${points}</div>`;
+                }
+                else if(type === "اضافة"){
+                    totalPoints += points;
+                    html += `<div class="add">${date} | إضافة | ${reason} | ${points}</div>`;
+                }
+            }
+
+        });
+
+        if(!found){
             resultBox.innerHTML = "لا توجد بيانات لهذا الرقم";
             return;
         }
 
-        // ===== الرصيد الأساسي =====
-        let totalPoints = 12;
-
-        // ===== عرض البيانات =====
-        let html = `<b>الاسم:</b> ${records[0].name}<br><br>`;
-        html += `<ul>`;
-
-        records.forEach(rec => {
-
-            // توحيد كلمة اضافة (مع أو بدون همزة)
-            let type = rec.type.replace("إ","ا").trim();
-
-            if(type === "خصم"){
-                totalPoints -= rec.points;
-                html += `<li class="deduct">${rec.date} | خصم | ${rec.reason} | ${rec.points}</li>`;
-            }
-            else if(type === "اضافة"){
-                totalPoints += rec.points;
-                html += `<li class="add">${rec.date} | إضافة | ${rec.reason} | ${rec.points}</li>`;
-            }
-        });
-
-        html += `</ul>`;
-
-        // ===== حدود النقاط =====
+        // ضبط الحدود
         if(totalPoints > 12) totalPoints = 12;
         if(totalPoints < 0) totalPoints = 0;
 
-        html += `<div class="points-final">النقاط الحالية: ${totalPoints} / 12</div>`;
-
-        // ===== تنبيه إذا النقاط منخفضة =====
-        if(totalPoints <= 6){
-            html += `<div class="warning">تنبيه: النقاط منخفضة</div>`;
-        }
-
-        resultBox.innerHTML = html;
+        resultBox.innerHTML = `
+            <b>الاسم:</b> ${name}<br><br>
+            ${html}
+            <div class="points-final">النقاط الحالية: ${totalPoints} / 12</div>
+        `;
 
     }
     catch(error){
-        resultBox.innerHTML = "حدث خطأ في جلب البيانات";
+        resultBox.innerHTML = "فشل الاتصال بملف البيانات";
         console.error(error);
     }
 }

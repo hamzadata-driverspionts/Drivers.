@@ -122,7 +122,7 @@ async function search() {
                 }
                 else if(type === "اضافة"){
                     totalPoints += points;
-                    html += `<div class="add">${date} | إضافة | ${reason} | ${points}</div>`;
+                    html += `<div class="add">${date} | إضافة | ${reason} | $ نقطة {points}</div>`;
                 }
             }
 

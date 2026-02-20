@@ -113,13 +113,26 @@ async function search() {
         }
 
         // حساب النقاط النهائية
-        let basePoints = 12; // النقاط الأساسية لكل سائق
-        let totalPoints = basePoints;
-        let recordHTML = `<b>الاسم:</b> ${records[0].name}<br><b>سجل النقاط:</b><br><ul>`;
+        let totalPoints = 12; // الحد الأقصى والأساسي
 
-        for(let rec of records){
-            if(rec.type.toLowerCase() === "خصم") totalPoints -= rec.points;
-            else if(rec.type.toLowerCase() === "اضافة") totalPoints += rec.points;
+records.forEach(rec => {
+    if(rec.type === "خصم"){
+        totalPoints -= rec.points;
+    }
+    else if(rec.type === "إضافة"){
+        totalPoints += rec.points;
+    }
+
+    // منع تجاوز الحد الأعلى
+    if(totalPoints > 12){
+        totalPoints = 12;
+    }
+
+    // منع النزول أقل من صفر (اختياري ومفيد)
+    if(totalPoints < 0){
+        totalPoints = 0;
+    }
+});
 
             recordHTML += `<li>${rec.date} | ${rec.type} | ${rec.reason} | ${rec.points}</li>`;
         }
